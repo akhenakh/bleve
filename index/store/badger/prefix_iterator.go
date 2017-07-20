@@ -27,7 +27,7 @@ func (i *PrefixIterator) Key() []byte {
 }
 
 func (i *PrefixIterator) Value() []byte {
-	return i.iterator.Item().Key()
+	return i.iterator.Item().Value()
 }
 
 func (i *PrefixIterator) Valid() bool {

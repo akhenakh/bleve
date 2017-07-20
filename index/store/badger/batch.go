@@ -12,11 +12,14 @@ type Batch struct {
 }
 
 func (b *Batch) Set(key, val []byte) {
-	b.entries = badger.EntriesSet(b.entries, key, val)
+	kc := key[:]
+	vc := val[:]
+	b.entries = badger.EntriesSet(b.entries, kc, vc)
 }
 
 func (b *Batch) Delete(key []byte) {
-	b.entries = badger.EntriesDelete(b.entries, key)
+	kc := key[:]
+	b.entries = badger.EntriesDelete(b.entries, kc)
 }
 
 func (b *Batch) Merge(key, val []byte) {

@@ -31,19 +31,21 @@ func (r *Reader) MultiGet(keys [][]byte) ([][]byte, error) {
 func (r *Reader) PrefixIterator(k []byte) store.KVIterator {
 	rv := PrefixIterator{
 		iterator: r.kv.NewIterator(*r.itrOpts),
+		prefix:   k,
 	}
 	rv.iterator.Seek(k)
 	return &rv
 }
 
 func (r *Reader) RangeIterator(start, end []byte) store.KVIterator {
-	rv := PrefixIterator{
+	rv := RangeIterator{
 		iterator: r.kv.NewIterator(*r.itrOpts),
+		stop:     end,
 	}
 	rv.iterator.Seek(start)
 	return &rv
 }
 
 func (r *Reader) Close() error {
-	return r.kv.Close()
+	return nil
 }

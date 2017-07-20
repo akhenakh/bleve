@@ -1,6 +1,10 @@
 package badger
 
-import "github.com/dgraph-io/badger"
+import (
+	"bytes"
+
+	"github.com/dgraph-io/badger"
+)
 
 type RangeIterator struct {
 	iterator *badger.Iterator
@@ -27,11 +31,22 @@ func (i *RangeIterator) Key() []byte {
 }
 
 func (i *RangeIterator) Value() []byte {
-	return i.iterator.Item().Key()
+	return i.iterator.Item().Value()
 }
 
 func (i *RangeIterator) Valid() bool {
-	return i.iterator.Valid()
+	if !i.iterator.Valid() {
+		return false
+	}
+
+	if i.stop == nil || len(i.stop) == 0 {
+		return true
+	}
+
+	if bytes.Compare(i.stop, i.iterator.Item().Key()) < 0 {
+		return false
+	}
+	return true
 }
 
 func (i *RangeIterator) Close() error {

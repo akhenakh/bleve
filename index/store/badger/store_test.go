@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"log"
+
 	"github.com/blevesearch/bleve/index/store"
 	"github.com/blevesearch/bleve/index/store/test"
 )
@@ -22,6 +24,7 @@ func open(t *testing.T, mo store.MergeOperator) store.KVStore {
 func cleanup(t *testing.T, s store.KVStore) {
 	err := s.Close()
 	if err != nil {
+		log.Printf("%+v\n", err)
 		t.Fatal(err)
 	}
 	err = os.RemoveAll("testbadger")

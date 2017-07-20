@@ -51,15 +51,16 @@ func New(mo store.MergeOperator, config map[string]interface{}) (store.KVStore, 
 		return nil, os.ErrInvalid
 	}
 
-	// TODO: apply full config
 	opt := badger.DefaultOptions
 	opt.Dir = path
 	opt.ValueDir = path
 
 	if cdir, ok := config["create_if_missing"].(bool); ok && cdir {
-		err := os.Mkdir(path, os.FileMode(0700))
-		if err != nil {
-			return nil, err
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			err := os.Mkdir(path, os.FileMode(0700))
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
