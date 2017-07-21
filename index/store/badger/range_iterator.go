@@ -31,7 +31,10 @@ func (i *RangeIterator) Key() []byte {
 }
 
 func (i *RangeIterator) Value() []byte {
-	return i.iterator.Item().Value()
+	vs := i.iterator.Item().Value()
+	v := make([]byte, len(vs))
+	copy(v, vs)
+	return v
 }
 
 func (i *RangeIterator) Valid() bool {

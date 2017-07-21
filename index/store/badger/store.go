@@ -69,10 +69,7 @@ func New(mo store.MergeOperator, config map[string]interface{}) (store.KVStore, 
 		return nil, err
 	}
 
-	itrOpts, err := applyIteratorOptions(&badger.IteratorOptions{}, config)
-	if err != nil {
-		return nil, err
-	}
+	itrOpts := &badger.DefaultIteratorOptions
 
 	rv := Store{
 		path:    path,

@@ -31,7 +31,7 @@ func (r *Reader) MultiGet(keys [][]byte) ([][]byte, error) {
 func (r *Reader) PrefixIterator(k []byte) store.KVIterator {
 	rv := PrefixIterator{
 		iterator: r.kv.NewIterator(*r.itrOpts),
-		prefix:   k,
+		prefix:   k[:],
 	}
 	rv.iterator.Seek(k)
 	return &rv
@@ -40,7 +40,7 @@ func (r *Reader) PrefixIterator(k []byte) store.KVIterator {
 func (r *Reader) RangeIterator(start, end []byte) store.KVIterator {
 	rv := RangeIterator{
 		iterator: r.kv.NewIterator(*r.itrOpts),
-		stop:     end,
+		stop:     end[:],
 	}
 	rv.iterator.Seek(start)
 	return &rv
