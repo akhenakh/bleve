@@ -9,12 +9,14 @@ import (
 
 type Writer struct {
 	s *Store
+	*badger.Txn
 }
 
 func (w *Writer) NewBatch() store.KVBatch {
 	return &Batch{
 		store: w.s,
 		merge: store.NewEmulatedMerge(w.s.mo),
+		Txn:   w.Txn,
 	}
 }
 
@@ -31,23 +33,25 @@ func (w *Writer) ExecuteBatch(b store.KVBatch) error {
 	// first process merges
 	for k, mergeOps := range batch.merge.Merges {
 		kb := []byte(k)
-		item := &badger.KVItem{}
-		err := w.s.kv.Get(kb, item)
+		item, err := w.Txn.Get(kb)
 		if err != nil {
 			return err
 		}
-		mergedVal, fullMergeOk := w.s.mo.FullMerge(kb, item.Value(), mergeOps)
+		v, err := item.Value()
+		if err != nil {
+			return err
+		}
+		mergedVal, fullMergeOk := w.s.mo.FullMerge(kb, v, mergeOps)
 		if !fullMergeOk {
 			return fmt.Errorf("merge operator returned failure")
 		}
-		// add the final merge to this batch
-		batch.entries = badger.EntriesSet(batch.entries, kb, mergedVal)
+		w.Txn.Set(kb, mergedVal, 0)
 	}
 
-	return w.s.kv.BatchSet(batch.entries)
+	return w.Txn.Commit(nil)
 }
 
 func (w *Writer) Close() error {
 	w.s = nil
-	return nil
+	return w.Txn.Commit(nil)
 }

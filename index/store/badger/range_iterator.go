@@ -31,7 +31,8 @@ func (i *RangeIterator) Key() []byte {
 }
 
 func (i *RangeIterator) Value() []byte {
-	return i.iterator.Item().Value()
+	v, _ := i.iterator.Item().Value()
+	return v
 }
 
 func (i *RangeIterator) Valid() bool {
