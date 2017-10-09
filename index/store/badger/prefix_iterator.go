@@ -1,6 +1,10 @@
 package badger
 
-import "github.com/dgraph-io/badger"
+import (
+	"bytes"
+
+	"github.com/dgraph-io/badger"
+)
 
 type PrefixIterator struct {
 	iterator *badger.Iterator
@@ -8,6 +12,10 @@ type PrefixIterator struct {
 }
 
 func (i *PrefixIterator) Seek(key []byte) {
+	if bytes.Compare(key, i.prefix) < 0 {
+		i.iterator.Seek(i.prefix)
+		return
+	}
 	i.iterator.Seek(key)
 }
 

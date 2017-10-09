@@ -56,7 +56,7 @@ func (i *RangeIterator) Valid() bool {
 		return true
 	}
 
-	if bytes.Compare(i.stop, i.iterator.Item().Key()) < 0 {
+	if bytes.Compare(i.stop, i.iterator.Item().Key()) <= 0 {
 		return false
 	}
 	return true
