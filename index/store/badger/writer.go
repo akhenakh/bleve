@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/blevesearch/bleve/index/store"
+	"github.com/dgraph-io/badger"
 )
 
 type Writer struct {
@@ -32,12 +33,16 @@ func (w *Writer) ExecuteBatch(b store.KVBatch) error {
 	for k, mergeOps := range batch.merge.Merges {
 		kb := []byte(k)
 		item, err := batch.Txn.Get(kb)
-		if err != nil {
+		if err != nil && err != badger.ErrKeyNotFound {
 			return err
 		}
-		v, err := item.Value()
-		if err != nil {
-			return err
+		var v []byte
+		if err != badger.ErrKeyNotFound {
+			vt, err := item.Value()
+			if err != nil {
+				return err
+			}
+			v = vt
 		}
 		mergedVal, fullMergeOk := w.s.mo.FullMerge(kb, v, mergeOps)
 		if !fullMergeOk {
