@@ -8,10 +8,15 @@ import (
 
 type RangeIterator struct {
 	iterator *badger.Iterator
+	start    []byte
 	stop     []byte
 }
 
 func (i *RangeIterator) Seek(key []byte) {
+	if bytes.Compare(key, i.start) < 0 {
+		i.iterator.Seek(i.start)
+		return
+	}
 	i.iterator.Seek(key)
 }
 
@@ -27,11 +32,18 @@ func (i *RangeIterator) Current() ([]byte, []byte, bool) {
 }
 
 func (i *RangeIterator) Key() []byte {
-	return i.iterator.Item().Key()
+	ks := i.iterator.Item().Key()
+	k := make([]byte, len(ks))
+	copy(k, ks)
+
+	return k
 }
 
 func (i *RangeIterator) Value() []byte {
-	v, _ := i.iterator.Item().Value()
+	vs, _ := i.iterator.Item().Value()
+	v := make([]byte, len(vs))
+	copy(v, vs)
+
 	return v
 }
 

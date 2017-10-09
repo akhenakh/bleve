@@ -23,11 +23,18 @@ func (i *PrefixIterator) Current() ([]byte, []byte, bool) {
 }
 
 func (i *PrefixIterator) Key() []byte {
-	return i.iterator.Item().Key()
+	ks := i.iterator.Item().Key()
+	k := make([]byte, len(ks))
+	copy(k, ks)
+
+	return k
 }
 
 func (i *PrefixIterator) Value() []byte {
-	v, _ := i.iterator.Item().Value()
+	vs, _ := i.iterator.Item().Value()
+	v := make([]byte, len(vs))
+	copy(v, vs)
+
 	return v
 }
 

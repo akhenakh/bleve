@@ -6,7 +6,9 @@ import (
 )
 
 type Reader struct {
-	itrOpts *badger.IteratorOptions
+	// you can modify ItrOpts before calling PrefixIterator or PrefixIterator
+	// defaulted to badger.DefaultIteratorOptions by store.Reader()
+	ItrOpts badger.IteratorOptions
 	*badger.Txn
 }
 
@@ -32,7 +34,7 @@ func (r *Reader) MultiGet(keys [][]byte) ([][]byte, error) {
 
 func (r *Reader) PrefixIterator(k []byte) store.KVIterator {
 	rv := PrefixIterator{
-		iterator: r.Txn.NewIterator(*r.itrOpts),
+		iterator: r.Txn.NewIterator(r.ItrOpts),
 		prefix:   k[:],
 	}
 	rv.iterator.Seek(k)
@@ -41,7 +43,8 @@ func (r *Reader) PrefixIterator(k []byte) store.KVIterator {
 
 func (r *Reader) RangeIterator(start, end []byte) store.KVIterator {
 	rv := RangeIterator{
-		iterator: r.Txn.NewIterator(*r.itrOpts),
+		iterator: r.Txn.NewIterator(r.ItrOpts),
+		start:    start[:],
 		stop:     end[:],
 	}
 	rv.iterator.Seek(start)
