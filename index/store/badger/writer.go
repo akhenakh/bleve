@@ -4,19 +4,17 @@ import (
 	"fmt"
 
 	"github.com/blevesearch/bleve/index/store"
-	"github.com/dgraph-io/badger"
 )
 
 type Writer struct {
 	s *Store
-	*badger.Txn
 }
 
 func (w *Writer) NewBatch() store.KVBatch {
 	return &Batch{
 		store: w.s,
 		merge: store.NewEmulatedMerge(w.s.mo),
-		Txn:   w.Txn,
+		Txn:   w.s.db.NewTransaction(true),
 	}
 }
 
@@ -33,7 +31,7 @@ func (w *Writer) ExecuteBatch(b store.KVBatch) error {
 	// first process merges
 	for k, mergeOps := range batch.merge.Merges {
 		kb := []byte(k)
-		item, err := w.Txn.Get(kb)
+		item, err := batch.Txn.Get(kb)
 		if err != nil {
 			return err
 		}
@@ -45,13 +43,13 @@ func (w *Writer) ExecuteBatch(b store.KVBatch) error {
 		if !fullMergeOk {
 			return fmt.Errorf("merge operator returned failure")
 		}
-		w.Txn.Set(kb, mergedVal, 0)
+		batch.Txn.Set(kb, mergedVal, 0)
 	}
 
-	return w.Txn.Commit(nil)
+	return batch.Txn.Commit(nil)
 }
 
 func (w *Writer) Close() error {
 	w.s = nil
-	return w.Txn.Commit(nil)
+	return nil
 }

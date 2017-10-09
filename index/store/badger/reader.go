@@ -12,6 +12,9 @@ type Reader struct {
 
 func (r *Reader) Get(k []byte) ([]byte, error) {
 	item, err := r.Txn.Get(k)
+	if err == badger.ErrKeyNotFound {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

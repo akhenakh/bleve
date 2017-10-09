@@ -93,8 +93,7 @@ func (s *Store) Reader() (store.KVReader, error) {
 
 func (s *Store) Writer() (store.KVWriter, error) {
 	return &Writer{
-		s:   s,
-		Txn: s.db.NewTransaction(true),
+		s: s,
 	}, nil
 }
 

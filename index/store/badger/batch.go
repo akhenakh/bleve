@@ -18,7 +18,7 @@ func (b *Batch) Set(key, val []byte) {
 	valc := make([]byte, len(val))
 	copy(valc, val)
 
-	b.Txn.Set(valc, val, 0)
+	b.Txn.Set(keyc, valc, 0)
 }
 
 func (b *Batch) Delete(key []byte) {
@@ -34,10 +34,11 @@ func (b *Batch) Merge(key, val []byte) {
 
 func (b *Batch) Reset() {
 	b.merge = store.NewEmulatedMerge(b.store.mo)
-	b.Txn.Discard()
+	b.Txn = b.store.db.NewTransaction(true)
 }
 
 func (b *Batch) Close() error {
 	b.merge = nil
+	b.Txn.Discard()
 	return nil
 }
