@@ -125,6 +125,15 @@
 			"branch": "master",
 			"path": "/unicode/norm",
 			"notests": true
+		},
+        {
+			"importpath": "github.com/dgraph-io/badger",
+			"repository": "https://github.com/dgraph-io/badger",
+			"vcs": "",
+			"revision": "0f9ee98164adc8f80c50bcc7fa6a7036ccce5cf2",
+			"branch": "master",
+			"path": "/badger",
+			"notests": true
 		}
 	]
 }
